@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//edited by mohamed ibrahim
+
 public class AddCategoryActivity extends AppCompatActivity {
 
     List<Integer> imageList = new ArrayList<>();
