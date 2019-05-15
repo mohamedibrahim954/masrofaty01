@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">masrofaty</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_name">Fullname</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_register">REGISTER</string>
+    <string name="btn_link_to_register">Not a member? Sign up now.</string>
+    <string name="btn_link_to_login">Already registred! Login Me.</string>
+    <string name="welcome">Welcome</string>
+    <string name="btn_logout">LOGOUT</string>
+    <string name="beginDayPrompt">"Select Begin Day Of Weak: "</string>
+    <string name="name" translatable="false">Fullname</string>
+
+    <string-array name="beginDaysArray">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+    <string name="enterBudget">enter your Budget</string>
+    <string name="registerForm">Rigister Form</string>
+    <string name="currency">Currency</string>
+    <string name="budgetValue">Budget Value</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="tab_text_3" translatable="false">USER</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="already_registered">already registered! Log in now.</string>
+    <string name="forget_password">forget Password</string>
+    <string name="no_internet_alert_title">No Internet Connection</string>
+    <string name="no_internet_alert_message">Please Check Your Internet Connection !</string>
+    <string name="email_prompt_forget_password">please enter your Account Email:</string>
+    <string name="income_tab_name">Income</string>
+    <string name="outcome_tab_name">Outcome</string>
+    <string name="add_category" translatable="false">Add Category</string>
+    <string name="update_menu_item">edit</string>
+    <string name="delete_menu_item">delete</string>
+    <string name="category_name">Category Name</string>
+    <string name="category_pic">Category Picture:</string>
+    <string name="category_type">Catergory Type:</string>
+    <string name="update_category">Update Category</string>
+    <string name="add_item">Add Item</string>
+    <string name="Item_name">Name</string>
+    <string name="item_price">Price</string>
+    <string name="item_notes">Notes</string>
+    <string name="item_out_category">"Category: "</string>
+    <string name="item_in_category">"Spend from: "</string>
+    <string name="update_item">update Item</string>
+    <string name="category_money">money</string>
+    <string name="have_verification_code">have Verification Code</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="new_password">new Password</string>
+    <string name="send">Send</string>
+</resources>

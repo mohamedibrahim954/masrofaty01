@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">masrofaty</string>
+    <string name="hint_email">البريد الإلكتروني</string>
+    <string name="hint_password">كلمة السر</string>
+    <string name="btn_login">تسجيل الدخول</string>
+    <string name="btn_register">التسجيل</string>
+    <string name="btn_link_to_register">لست عضو! التسجيل الآن</string>
+    <string name="btn_link_to_login">لقد سبق لك التسجيل</string>
+    <string name="welcome">مرحب بك</string>
+    <string name="btn_logout">تسجيل الخروج</string>
+    <string name="hint_name">اسم المستخدم</string>
+    <string name="beginDayPrompt">"اختر بداية الاسبوع: "</string>
+    <string name="enterBudget">ادخال ميزانيتك</string>
+    <string name="registerForm">نموذج التسجيل</string>
+    <string name="currency">العملة</string>
+    <string name="budgetValue">قيمة ميزانيتك</string>
+    <string name="already_registered">مشترك بالفعل! سجل دخولك الان.</string>
+    <string name="forget_password">نسيت كلمة السر</string>
+    <string name="no_internet_alert_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="no_internet_alert_message">من فضلك تحقق من اتصالك بالإنترنت !</string>
+    <string name="email_prompt_forget_password">"من فضللك ادخل البريد الإلكتروني لحسابك: "</string>
+    <string name="income_tab_name">الدخل</string>
+    <string name="outcome_tab_name">المصروفات</string>
+    <string name="update_menu_item">تحديث</string>
+    <string name="delete_menu_item">حذف</string>
+</resources>
