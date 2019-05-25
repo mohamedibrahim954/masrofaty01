@@ -1,9 +1,9 @@
 package com.medotech.masrofaty01;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -51,7 +49,7 @@ public class AddCategoryActivity extends AppCompatActivity {
         categoryRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
+               /* switch (checkedId) {
                     case R.id.income_radio_button:
                         categoryMoneyLinearLayout.setVisibility(View.VISIBLE);
                         break;
@@ -59,7 +57,7 @@ public class AddCategoryActivity extends AppCompatActivity {
                         categoryMoneyLinearLayout.setVisibility(View.GONE);
                         break;
 
-                }
+                }*/
             }
         });
 
@@ -132,14 +130,14 @@ public class AddCategoryActivity extends AppCompatActivity {
         switch (categoryRadioGroup.getCheckedRadioButtonId()) {
             case R.id.income_radio_button:
                 URL = ServerURL.GET_ALL_INCOME_CATEGORIES_URL;
-                categoryMoney = categoryMoneyInputLayout.getEditText().getText().toString().trim();
+                /*categoryMoney = categoryMoneyInputLayout.getEditText().getText().toString().trim();
                 if (TextUtils.isEmpty(categoryMoney)) {
                     categoryMoneyInputLayout.setErrorEnabled(true);
                     categoryMoneyInputLayout.setError("Money Can't Be Empty !!");
                     return;
                 } else {
                     categoryMoneyInputLayout.setErrorEnabled(false);
-                }
+                }*/
                 break;
             case R.id.outcome_radio_button:
                 URL = ServerURL.GET_ALL_OUTCOME_CATEGORIES_URL;
@@ -179,19 +177,19 @@ public class AddCategoryActivity extends AppCompatActivity {
         };
         TransferData transferData = new TransferData(Request.Method.POST, URL, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };
         Map<String, String> dataMap = new HashMap<>();
         dataMap.put("id", "0");
         dataMap.put("Name", Name);
-        if (categoryRadioGroup.getCheckedRadioButtonId() == R.id.income_radio_button) {
+        /*if (categoryRadioGroup.getCheckedRadioButtonId() == R.id.income_radio_button) {
             dataMap.put("Price", money);
-        }
+        }*/
         dataMap.put("Icon", Icon);
         transferData.setDataMap(dataMap);
         RequestQueue mainRequestQueue = MainRequestQueue.getInstance(getApplicationContext()).getRequestQueue();

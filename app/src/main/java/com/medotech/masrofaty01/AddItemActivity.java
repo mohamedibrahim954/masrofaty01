@@ -1,9 +1,9 @@
 package com.medotech.masrofaty01;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -85,7 +84,7 @@ public class AddItemActivity extends AppCompatActivity {
         ArrayAdapter inArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, inCategoryNameList);
         inComeSpinner.setAdapter(inArrayAdapter);
 
-        if (categoryType.equals("OUTCOME")) {
+       /* if (categoryType.equals("OUTCOME")) {
             outComeSpinner.setSelection(outCategoryNameList.indexOf(categoryName));
             outcomeLinearLayout.setVisibility(View.GONE);
         } else {
@@ -93,24 +92,23 @@ public class AddItemActivity extends AppCompatActivity {
                 inComeSpinner.setSelection(inCategoryNameList.indexOf(categoryName));
                 incomeLinearLayout.setVisibility(View.GONE);
             }
-        }
+        }*/
 
         if (!isNew) {
             itemUpdateId = bundle.getString("itemId");
             String itemUpdateName = bundle.getString("itemName");
             String itemUpdatePrice = bundle.getString("itemPrice");
             String itemUpdateNotes = bundle.getString("itemNotes");
-            String itemUpdateIncomeName = bundle.getString("itemIncomeName");
-            String itemUpdateOutcomeName = bundle.getString("itemOutcomeName");
-
+            //String itemUpdateIncomeName = bundle.getString("itemIncomeName");
+            //String itemUpdateOutcomeName = bundle.getString("itemOutcomeName");
             addItemButton.setText(R.string.update_item);
-            outcomeLinearLayout.setVisibility(View.VISIBLE);
-            incomeLinearLayout.setVisibility(View.VISIBLE);
+            //outcomeLinearLayout.setVisibility(View.VISIBLE);
+            //incomeLinearLayout.setVisibility(View.VISIBLE);
             nameInputLayout.getEditText().setText(itemUpdateName);
             priceInputLayout.getEditText().setText(itemUpdatePrice);
             notesInputLayout.getEditText().setText(itemUpdateNotes);
-            inComeSpinner.setSelection(inCategoryNameList.indexOf(itemUpdateIncomeName));
-            outComeSpinner.setSelection(outCategoryNameList.indexOf(itemUpdateOutcomeName));
+            //inComeSpinner.setSelection(inCategoryNameList.indexOf(itemUpdateIncomeName));
+            //outComeSpinner.setSelection(outCategoryNameList.indexOf(itemUpdateOutcomeName));
 
         }
 
@@ -143,7 +141,7 @@ public class AddItemActivity extends AppCompatActivity {
             } else {
                 id = "0";
             }
-            addItem(id, itemName, itemNotes, itemPrice, incomeCategoryId, outcomeCategoryId);
+            addItem(id, itemName, itemNotes, itemPrice);
         }
     }
 
@@ -162,25 +160,24 @@ public class AddItemActivity extends AppCompatActivity {
 
         if (itemPrice.isEmpty()) {
             priceInputLayout.setErrorEnabled(true);
-            priceInputLayout.setError("Name Can't Be Empty !!");
+            priceInputLayout.setError("Price Can't Be Empty !!");
             return false;
         } else {
             priceInputLayout.setErrorEnabled(false);
         }
 
-        if (itemNotes.isEmpty()) {
+        /*if (itemNotes.isEmpty()) {
             notesInputLayout.setErrorEnabled(true);
             notesInputLayout.setError("Name Can't Be Empty !!");
             return false;
         } else {
             notesInputLayout.setErrorEnabled(false);
-        }
+        }*/
 
         return true;
     }
 
-    public void addItem(String id, String name, String notes, String price,
-                        String incomeCategoryId, String outcomeCategoryId) {
+    public void addItem(String id, String name, String notes, String price) {
 
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
@@ -209,10 +206,10 @@ public class AddItemActivity extends AppCompatActivity {
         };
         TransferData transferData = new TransferData(Request.Method.POST, ServerURL.ITEMS__URL, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };
@@ -221,8 +218,7 @@ public class AddItemActivity extends AppCompatActivity {
         dataMap.put("Name", name);
         dataMap.put("Notes", notes);
         dataMap.put("Price", price);
-        dataMap.put("InComeCategoryId", incomeCategoryId);
-        dataMap.put("OutComeCategoryId", outcomeCategoryId);
+        dataMap.put("CategoryId", categoryId);
         transferData.setDataMap(dataMap);
         RequestQueue mainRequestQueue = MainRequestQueue.getInstance(getApplicationContext()).getRequestQueue();
         MainRequestQueue.getInstance(getApplicationContext()).addToRequestQueue(transferData);

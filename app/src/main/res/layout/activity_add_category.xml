@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:background="#AA48F8B4"
+        android:background="#AA9FFAD5"
         android:gravity="center"
         android:text="@string/add_category"
         android:textColor="@android:color/holo_green_dark"
@@ -96,7 +96,8 @@
                 android:id="@+id/add_category_money_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/add_category_money_text_input"

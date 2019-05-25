@@ -54,4 +54,10 @@
     <string name="verification_code">Verification Code</string>
     <string name="new_password">new Password</string>
     <string name="send">Send</string>
+    <string name="edit_account">Edit My Account</string>
+    <string name="change_password">Change Password</string>
+    <string name="my_money">"My Money: "</string>
+    <string name="my_budget">My Budget:</string>
+    <string name="old_password">old Password</string>
+    <string name="confirm_password">confirm Password</string>
 </resources>

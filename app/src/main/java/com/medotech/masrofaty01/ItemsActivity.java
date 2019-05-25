@@ -1,10 +1,9 @@
 package com.medotech.masrofaty01;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -13,23 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.medotech.masrofaty01.util.TransferData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +52,7 @@ public class ItemsActivity extends AppCompatActivity {
         categoryType = bundle.getString("categoryType");
 
 
-        addItemFAB = (FloatingActionButton) findViewById(R.id.add_item_fab);
+        addItemFAB = findViewById(R.id.add_item_fab);
         addItemFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,26 +75,54 @@ public class ItemsActivity extends AppCompatActivity {
 
         arrayAdapter = new ArrayAdapter(this, R.layout.items_list, itemsList) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(final int position, View convertView, ViewGroup parent) {
                 if (convertView == null) {
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.items_list, parent, false);
                 }
                 TextView nameTextView = convertView.findViewById(R.id.item_name_text_view);
                 nameTextView.setText(itemsList.get(position).getName());
                 TextView priceTextView = convertView.findViewById(R.id.item_price_text_view);
-                priceTextView.setText("price: " + itemsList.get(position).getPrice() + " " + UserInfo.getInstance().getCurrency());
+                priceTextView.setText("price: " + itemsList.get(position).getPrice() + " " + UserInfo.getInstance(getApplicationContext()).getCurrency());
                 TextView categoryNameTextView = convertView.findViewById(R.id.item_category_name_text_view);
-                String s = "";
-                if (categoryType.equals("OUTCOME")) {
-                    s = getString(R.string.item_in_category) + itemsList.get(position).getIncomeCategoryName();
-                } else {
-                    if (categoryType.equals("INCOME")) {
-                        s = getString(R.string.item_out_category) + itemsList.get(position).getOutcomeCategoryName();
-                    }
-                }
+                String s = getString(R.string.item_out_category) + itemsList.get(position).getCategoryName();
                 categoryNameTextView.setText(s);
                 TextView createDateTextView = convertView.findViewById(R.id.item_create_date_text_view);
                 createDateTextView.setText(itemsList.get(position).getCreateDate());
+                final ImageView moreOptionImageView = convertView.findViewById(R.id.more_item_option_image_view);
+                moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PopupMenu popupMenu = new PopupMenu(ItemsActivity.this, moreOptionImageView);
+                        popupMenu.getMenuInflater().inflate(R.menu.context_menu, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.update_menu_item:
+                                        Intent intent = new Intent(getApplicationContext(), AddItemActivity.class);
+                                        intent.putExtra("categoryId", categoryId);
+                                        intent.putExtra("categoryName", categoryName);
+                                        intent.putExtra("categoryType", categoryType);
+                                        intent.putExtra("isNew", false);
+                                        intent.putExtra("itemId", itemsList.get(position).getId());
+                                        intent.putExtra("itemName", itemsList.get(position).getName());
+                                        intent.putExtra("itemPrice", itemsList.get(position).getPrice());
+                                        intent.putExtra("itemNotes", itemsList.get(position).getNotes());
+                                        startActivity(intent);
+                                        finish();
+                                        break;
+                                    case R.id.delete_menu_item:
+                                        String itemId = itemsList.get(position).getId();
+                                        deleteItem(itemId, position);
+
+                                        break;
+                                }
+                                return false;
+                            }
+                        });
+                        popupMenu.show();
+                    }
+                });
                 return convertView;
             }
         };
@@ -112,8 +137,7 @@ public class ItemsActivity extends AppCompatActivity {
                 intent.putExtra("itemName", itemsList.get(position).getName());
                 intent.putExtra("itemPrice", itemsList.get(position).getPrice());
                 intent.putExtra("itemNotes", itemsList.get(position).getNotes());
-                intent.putExtra("itemIncomeName", itemsList.get(position).getIncomeCategoryName());
-                intent.putExtra("itemOutcomeName", itemsList.get(position).getOutcomeCategoryName());
+                intent.putExtra("categoryName", itemsList.get(position).getCategoryName());
                 startActivity(intent);
             }
         });
@@ -149,8 +173,6 @@ public class ItemsActivity extends AppCompatActivity {
                 intent.putExtra("itemName", itemsList.get(contextMenuInfo.position).getName());
                 intent.putExtra("itemPrice", itemsList.get(contextMenuInfo.position).getPrice());
                 intent.putExtra("itemNotes", itemsList.get(contextMenuInfo.position).getNotes());
-                intent.putExtra("itemIncomeName", itemsList.get(contextMenuInfo.position).getIncomeCategoryName());
-                intent.putExtra("itemOutcomeName", itemsList.get(contextMenuInfo.position).getOutcomeCategoryName());
                 startActivity(intent);
                 finish();
                 break;
@@ -186,7 +208,7 @@ public class ItemsActivity extends AppCompatActivity {
             }
         };
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
+        /*Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 try {
@@ -199,17 +221,17 @@ public class ItemsActivity extends AppCompatActivity {
 
                 }
             }
-        };
+        };*/
 
         String url = String.format(ServerURL.DELETE_ITEM__URL + "?id=%1$s",
                 itemId);
 
-        TransferData transferData = new TransferData(Request.Method.GET, url, responseListener, errorListener) {
+        TransferData transferData = new TransferData(Request.Method.GET, url, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 headerMap.put("Content-Type", "application/json; charset=utf-8");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };
@@ -237,22 +259,12 @@ public class ItemsActivity extends AppCompatActivity {
                         String name = c.getString("Name");
                         String price = c.getString("Price");
                         String notes = c.getString("Notes");
-                        String incomeCategoryId = c.getString("IncomeCategoryId");
-                        String outComeCategoryId = c.getString("OutComeCategoryId");
-                        String incomeCategoryName = c.getString("IncomeCategoryName");
-                        String outcomeCategoryName = c.getString("OutComeCategoryName");
+                        String categoryId = c.getString("CategoryId");
+                        String catName = c.getString("CategoryName");
                         String createDate = c.getString("CreateDate");
 
-                        String cat = "";
-                        if (categoryType.equals("OUTCOME")) {
-                            cat = outcomeCategoryName;
-                        } else {
-                            if (categoryType.equals("INCOME")) {
-                                cat = incomeCategoryName;
-                            }
-                        }
-                        if (categoryName.equals(cat)) {
-                            Item item = new Item(id, name, notes, price, incomeCategoryId, outComeCategoryId, incomeCategoryName, outcomeCategoryName, createDate);
+                        if (categoryName.equals(catName)) {
+                            Item item = new Item(id, name, notes, price, categoryId, catName, createDate);
                             list.add(item);
                         }
 
@@ -268,10 +280,10 @@ public class ItemsActivity extends AppCompatActivity {
         };
         TransferData transferData = new TransferData(Request.Method.GET, url, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };

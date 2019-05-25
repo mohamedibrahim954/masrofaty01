@@ -2,15 +2,18 @@ package com.medotech.masrofaty01;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -40,11 +43,16 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText nameEditText, emailEditText, passEditText, budgetEditText;
     private Spinner beginDaySpinner, currenciesSpinner;
     private Switch budgetSwitch;
+    private Button registerButton;
     private List<String> currenciesList = new ArrayList<String>();
     private int currencySelectedIndex;
 
+    private FrameLayout progressBarHolder;
+
     private SessionManager session;
     private SqliteHandler db;
+    private AlphaAnimation inAnimation;
+    private AlphaAnimation outAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +83,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         beginDaySpinner = findViewById(R.id.beginDaySpinner);
         currenciesSpinner = findViewById(R.id.currencySpinner);
+
+        registerButton = findViewById(R.id.register_button);
+
+        progressBarHolder = findViewById(R.id.progress_circular_holder);
 
         Currency currency = new Currency(getApplicationContext());
         currenciesList = currency.getCurrencies();
@@ -156,6 +168,13 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
         }
+
+        registerButton.setEnabled(false);
+        inAnimation = new AlphaAnimation(0f, 1f);
+        inAnimation.setDuration(200);
+        progressBarHolder.setAnimation(inAnimation);
+        progressBarHolder.setVisibility(View.VISIBLE);
+
         requestRegister(nameString, emailString, passwordString, currencyID, beginDayNumber, budgetSwitch.isChecked(), budgetString);
     }
 
@@ -193,8 +212,14 @@ public class RegisterActivity extends AppCompatActivity {
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Toast.makeText(getApplicationContext(), "recieve respose!!", Toast.LENGTH_SHORT).show();
                 System.out.println(response);
+
+                outAnimation = new AlphaAnimation(1f, 0f);
+                outAnimation.setDuration(200);
+                progressBarHolder.setAnimation(outAnimation);
+                progressBarHolder.setVisibility(View.GONE);
+                registerButton.setEnabled(true);
+
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     int responseCode = jsonObject.getInt("Code");
@@ -202,13 +227,14 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), requestDetails, Toast.LENGTH_LONG).show();
                     if (responseCode == 1) {
                         session.setLogin(true);
+
                         String fullName = jsonObject.getString("FullName");
                         String email = jsonObject.getString("Email");
                         String token_type = jsonObject.getString("token_type");
                         String access_token = jsonObject.getString("access_token");
                         String Authorization = token_type + ' ' + access_token;
                         db.addUser(fullName, email, Authorization);
-                        UserInfo.getInstance().addInfo(fullName, email, Authorization);
+                        UserInfo.getInstance(getApplicationContext()).addInfo(fullName, email, Authorization);
                         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                         startActivity(intent);
                         finish();

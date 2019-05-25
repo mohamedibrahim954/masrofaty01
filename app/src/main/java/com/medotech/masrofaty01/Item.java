@@ -1,19 +1,22 @@
 package com.medotech.masrofaty01;
 
 public class Item {
-    private String id, name, notes, price, incomeCategoryId, outComeCategoryId, incomeCategoryName,
-            outcomeCategoryName, createDate;
+    private String id;
+    private String name;
+    private String notes;
+    private String price;
+    private String categoryId;
+    private String categoryName;
+    private String createDate;
 
     public Item(String id, String name, String notes, String price,
-                String incomeCategoryId, String outComeCategoryId, String incomeCategoryName, String outcomeCategoryName, String createDate) {
+                String categoryId, String categoryName, String createDate) {
         this.id = id;
         this.name = name;
         this.notes = notes;
         this.price = price;
-        this.incomeCategoryId = incomeCategoryId;
-        this.outComeCategoryId = outComeCategoryId;
-        this.incomeCategoryName = incomeCategoryName;
-        this.outcomeCategoryName = outcomeCategoryName;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
         this.createDate = createDate;
     }
 
@@ -34,6 +37,8 @@ public class Item {
     }
 
     public String getNotes() {
+        if (notes.equals("null"))
+            return "";
         return notes;
     }
 
@@ -49,36 +54,20 @@ public class Item {
         this.price = price;
     }
 
-    public String getIncomeCategoryId() {
-        return incomeCategoryId;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setIncomeCategoryId(String incomeCategoryId) {
-        this.incomeCategoryId = incomeCategoryId;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public String getOutComeCategoryId() {
-        return outComeCategoryId;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setOutComeCategoryId(String outComeCategoryId) {
-        this.outComeCategoryId = outComeCategoryId;
-    }
-
-    public String getIncomeCategoryName() {
-        return incomeCategoryName;
-    }
-
-    public void setIncomeCategoryName(String incomeCategoryName) {
-        this.incomeCategoryName = incomeCategoryName;
-    }
-
-    public String getOutcomeCategoryName() {
-        return outcomeCategoryName;
-    }
-
-    public void setOutcomeCategoryName(String outcomeCategoryName) {
-        this.outcomeCategoryName = outcomeCategoryName;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public String getCreateDate() {

@@ -1,17 +1,18 @@
 package com.medotech.masrofaty01;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressLint("ValidFragment")
 public class OutcomeTab extends CategoryTab {
 
     public static List<Category> categoryList = new ArrayList<>();
@@ -33,8 +35,11 @@ public class OutcomeTab extends CategoryTab {
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
 
-    public OutcomeTab() {
+    private Context context;
 
+    @SuppressLint("ValidFragment")
+    public OutcomeTab(Context context1) {
+        this.context = context1;
 
     }
 
@@ -72,10 +77,10 @@ public class OutcomeTab extends CategoryTab {
         };
         TransferData transferData = new TransferData(Request.Method.GET, ServerURL.GET_ALL_OUTCOME_CATEGORIES_URL, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getActivity().getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };
@@ -98,8 +103,25 @@ public class OutcomeTab extends CategoryTab {
 
         System.out.println("fragmment onCreateView method ");
         recyclerView = rootView.findViewById(R.id.recycler_view_outcome);
-        recyclerViewAdapter = new RecyclerViewAdapter(getActivity().getApplicationContext(), this, categoryList);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(), 3));
+        recyclerViewAdapter = new RecyclerViewAdapter(context, this, categoryList);
+
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 3);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        }
+                        int viewWidth = recyclerView.getMeasuredWidth();
+                        float cardViewWidth = getActivity().getResources().getDimension(R.dimen.category_card_view);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        gridLayoutManager.setSpanCount(newSpanCount);
+                        gridLayoutManager.requestLayout();
+                    }
+                }
+        );
         recyclerView.setAdapter(recyclerViewAdapter);
 
         registerForContextMenu(recyclerView);
@@ -155,10 +177,10 @@ public class OutcomeTab extends CategoryTab {
 
         TransferData transferData = new TransferData(Request.Method.GET, url, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getActivity().getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };

@@ -2,15 +2,16 @@ package com.medotech.masrofaty01;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,10 @@ public class loginActivity extends AppCompatActivity {
     private SessionManager session;
     private SqliteHandler db;
 
+    private FrameLayout progressBarHolder;
+    private AlphaAnimation inAnimation;
+    private AlphaAnimation outAnimation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +52,7 @@ public class loginActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.email);
         passEditText = findViewById(R.id.password);
         loginButton = findViewById(R.id.btnLogin);
+        progressBarHolder = findViewById(R.id.progress_bar_holder);
 
         passEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -85,19 +91,6 @@ public class loginActivity extends AppCompatActivity {
 
         Currency currency = new Currency(this);
         session = new SessionManager(getApplicationContext());
-        if (session.isLoggedIn()) {
-            // User is already logged in. Take him to main activity
-            Map<String, String> userInfo = db.getUserDetails();
-            System.out.println(userInfo.toString());
-            UserInfo.getInstance().addInfoMap(userInfo);
-
-            // get User Currency and set Currency in UserInfo
-            currency.getUserCurrency();
-
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-            startActivity(intent);
-            finish();
-        }
 
         CheckInternetConnection checkInternetConnection = new CheckInternetConnection(this);
         boolean networkState = checkInternetConnection.isConnectingToInternet();
@@ -111,9 +104,21 @@ public class loginActivity extends AppCompatActivity {
 
                         }
                     }).show();
+        } else {
+            if (session.isLoggedIn()) {
+                // User is already logged in. Take him to main activity
+                Map<String, String> userInfo = db.getUserDetails();
+                System.out.println(userInfo.toString());
+                UserInfo.getInstance(getApplicationContext()).addInfoMap(userInfo);
+
+                // get All User Info and set it in UserInfo
+                UserInfo.getInstance(getApplicationContext()).getAllUserInfo();
+
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(intent);
+                finish();
+            }
         }
-
-
     }
 
     public void AttemptLogin() {
@@ -121,6 +126,12 @@ public class loginActivity extends AppCompatActivity {
         String passwordString = passEditText.getText().toString();
         if (!emailString.isEmpty() && !passwordString.isEmpty()) {
             checkLogin(emailString, passwordString);
+
+            inAnimation = new AlphaAnimation(0f, 1f);
+            inAnimation.setDuration(200);
+            progressBarHolder.setAnimation(inAnimation);
+            progressBarHolder.setVisibility(View.VISIBLE);
+
         } else {
             Toast.makeText(getApplicationContext(), "please enter email and password!", Toast.LENGTH_LONG).show();
         }
@@ -128,13 +139,33 @@ public class loginActivity extends AppCompatActivity {
     }
 
     private void checkLogin(String email, String password) {
-        Map<String, String> loginData = new HashMap<>();
+        final Map<String, String> loginData = new HashMap<>();
         loginData.put("Email", email);
         loginData.put("Password", password);
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        loginData.put("DeviceId", token);
+                        System.out.println("InstanceId: " + token);
+                    }
+                });
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Toast.makeText(getApplicationContext(), "recieve respose!!", Toast.LENGTH_SHORT).show();
+
+                outAnimation = new AlphaAnimation(1f, 0f);
+                outAnimation.setDuration(200);
+                progressBarHolder.setAnimation(outAnimation);
+                progressBarHolder.setVisibility(View.GONE);
+
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     int responseCode = jsonObject.getInt("Code");
@@ -148,7 +179,8 @@ public class loginActivity extends AppCompatActivity {
                         String access_token = jsonObject.getString("access_token");
                         String Authorization = token_type + ' ' + access_token;
                         db.addUser(fullName, email, Authorization);
-                        UserInfo.getInstance().addInfo(fullName, email, Authorization);
+                        UserInfo.getInstance(getApplicationContext()).addInfo(fullName, email, Authorization);
+                        UserInfo.getInstance(getApplicationContext()).getAllUserInfo();
                         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                         startActivity(intent);
                         finish();

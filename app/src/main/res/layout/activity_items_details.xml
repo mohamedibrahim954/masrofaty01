@@ -75,21 +75,6 @@
                 android:text="Category"
                 android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="spend from: "
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/income_item_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:gravity="center"
-                android:text="spend from: "
-                android:textSize="20sp" />
 
 
         </LinearLayout>

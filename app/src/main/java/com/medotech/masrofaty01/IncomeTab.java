@@ -1,16 +1,18 @@
 package com.medotech.masrofaty01;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressLint("ValidFragment")
 public class IncomeTab extends CategoryTab {
 
     public static List<Category> categoryList = new ArrayList<>();
@@ -32,12 +35,16 @@ public class IncomeTab extends CategoryTab {
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
 
-    public IncomeTab() {
+    private Context context;
 
+    @SuppressLint("ValidFragment")
+    public IncomeTab(Context context1) {
+
+        this.context = context1;
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(final Context context) {
         super.onAttach(context);
 
         Response.Listener<String> responseListener = new Response.Listener<String>() {
@@ -69,10 +76,10 @@ public class IncomeTab extends CategoryTab {
         };
         TransferData transferData = new TransferData(Request.Method.GET, ServerURL.GET_ALL_INCOME_CATEGORIES_URL, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(context).getAuthorization());
                 return headerMap;
             }
         };
@@ -93,8 +100,28 @@ public class IncomeTab extends CategoryTab {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.income_tab, container, false);
         recyclerView = rootView.findViewById(R.id.recycler_view_income);
-        recyclerViewAdapter = new RecyclerViewAdapter(getActivity().getApplicationContext(), this, categoryList);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(), 3));
+        recyclerViewAdapter = new RecyclerViewAdapter(context, this, categoryList);
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 3);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        }
+                        int viewWidth = recyclerView.getMeasuredWidth();
+                        float cardViewWidth = getActivity().getResources().getDimension(R.dimen.category_card_view);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        /*int itemCount = recyclerViewAdapter.getItemCount();
+                        if (itemCount < newSpanCount){
+                            newSpanCount = itemCount;
+                        }*/
+                        gridLayoutManager.setSpanCount(newSpanCount);
+                        gridLayoutManager.requestLayout();
+                    }
+                }
+        );
         recyclerView.setAdapter(recyclerViewAdapter);
 
         registerForContextMenu(recyclerView);
@@ -149,10 +176,10 @@ public class IncomeTab extends CategoryTab {
 
         TransferData transferData = new TransferData(Request.Method.GET, url, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getActivity().getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };

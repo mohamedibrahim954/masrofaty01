@@ -1,20 +1,18 @@
 package com.medotech.masrofaty01;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,7 +45,7 @@ public class UpdateCategoryActivity extends AppCompatActivity {
         categoryType = bundle.getString("type");
         String categoryName = bundle.getString("name");
         int categoryIcon = bundle.getInt("icon");
-        String categoryMoney = bundle.getString("categoryMoney");
+        //String categoryMoney = bundle.getString("categoryMoney");
 
         System.out.println(categoryIcon);
 
@@ -93,7 +91,7 @@ public class UpdateCategoryActivity extends AppCompatActivity {
 
         categoryImageSpinner.setSelection(imageList.indexOf(categoryIcon));
 
-        LinearLayout categoryMoneyLinearLayout = findViewById(R.id.category_money_linear_layout);
+        /*LinearLayout categoryMoneyLinearLayout = findViewById(R.id.category_money_linear_layout);
         if (categoryType.equals("INCOME")) {
             categoryMoneyLinearLayout.setVisibility(View.VISIBLE);
             categoryMoneyInputLayout.getEditText().setText(categoryMoney);
@@ -103,7 +101,7 @@ public class UpdateCategoryActivity extends AppCompatActivity {
                 categoryMoneyLinearLayout.setVisibility(View.GONE);
             }
 
-        }
+        }*/
     }
 
     @Override
@@ -134,14 +132,14 @@ public class UpdateCategoryActivity extends AppCompatActivity {
 
         if (categoryType.equals("INCOME")) {
             URL = ServerURL.GET_ALL_INCOME_CATEGORIES_URL;
-            categoryMoney = categoryMoneyInputLayout.getEditText().getText().toString().trim();
+            /*categoryMoney = categoryMoneyInputLayout.getEditText().getText().toString().trim();
             if (TextUtils.isEmpty(categoryMoney)) {
                 categoryMoneyInputLayout.setErrorEnabled(true);
                 categoryMoneyInputLayout.setError("Money Can't Be Empty !!");
                 return;
             } else {
                 categoryMoneyInputLayout.setErrorEnabled(false);
-            }
+            }*/
 
         } else {
             if (categoryType.equals("OUTCOME")) {
@@ -149,11 +147,11 @@ public class UpdateCategoryActivity extends AppCompatActivity {
             }
         }
 
-        requestUpdateCategory(URL, categoryName, categoryImage, categoryMoney);
+        requestUpdateCategory(URL, categoryName, categoryImage);
 
     }
 
-    private void requestUpdateCategory(String url, String categoryName, String categoryImage, String categoryMoney) {
+    private void requestUpdateCategory(String url, String categoryName, String categoryImage) {
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -182,10 +180,10 @@ public class UpdateCategoryActivity extends AppCompatActivity {
         };
         TransferData transferData = new TransferData(Request.Method.POST, url, responseListener, null) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headerMap = new HashMap<>();
                 //headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", UserInfo.getInstance().getAuthorization());
+                headerMap.put("Authorization", UserInfo.getInstance(getApplicationContext()).getAuthorization());
                 return headerMap;
             }
         };
@@ -193,9 +191,7 @@ public class UpdateCategoryActivity extends AppCompatActivity {
         dataMap.put("id", categoryId);
         dataMap.put("Name", categoryName);
         dataMap.put("Icon", categoryImage);
-        if (categoryType.equals("INCOME")) {
-            dataMap.put("Price", categoryMoney);
-        }
+
         transferData.setDataMap(dataMap);
         RequestQueue mainRequestQueue = MainRequestQueue.getInstance(getApplicationContext()).getRequestQueue();
         MainRequestQueue.getInstance(getApplicationContext()).addToRequestQueue(transferData);
